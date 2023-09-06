@@ -3,9 +3,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "entities/entity.h"
 #include "vphys2d.h"
-#include "physics/object.h"
+#include "objects/object.h"
+#include "objects/player.h"
 #include "graphics/renderer.h"
 
 static Vphys2d *init(void);
@@ -24,8 +24,13 @@ static Vphys2d *init(void)
 
 	v->objects = list_create((destructor)object_destroy, sizeof(Object));
 
-	list_add(v->objects, object_create(entity_create(0, 100, 25, 25), (Vector2){0}, (Vector2){100.0f * 1.5f, 0.0f}, 5.0f, v->objects));
-	list_add(v->objects, object_create(entity_create(500, 600, 25, 25), (Vector2){0}, (Vector2){-50.0f * 1.5f, -150.0f * 1.5f}, 10.0f, v->objects));
+	v->player = player_create(object_create(entity_create(200, HEIGHT - 50, 50, 50), (Vector2){0}, (Vector2){0}, 15.0f, v->objects));
+
+	list_add(v->objects, v->player->obj);
+	list_add(v->objects, object_create(entity_create(WIDTH / 2.0f, 100, 25, 25), (Vector2){0}, (Vector2){0.0f, 100.0f}, 5.0f, v->objects));
+	list_add(v->objects, object_create(entity_create(WIDTH / 2.0f, 600, 25, 25), (Vector2){0}, (Vector2){0.0f, -700.0f * 1.5f}, 10.0f, v->objects));
+	list_add(v->objects, object_create(entity_create(0, 60, 25, 25), (Vector2){0}, (Vector2){0.0f, 100.0f}, 5.0f, v->objects));
+	list_add(v->objects, object_create(entity_create(0, 100, 25, 25), (Vector2){0}, (Vector2){0.0f, -700.0f * 1.5f}, 10.0f, v->objects));
 
 	return v;
 }
@@ -34,29 +39,28 @@ void vphys2d_run(void)
 {
 	Vphys2d *v = init();
 
-    const double delta_time = DELTA_TIME;
+	const double delta_time = DELTA_TIME;
 
-    double currentTime = GetTime();
+	double currentTime = GetTime();
 	double newTime;
-    double accumulator = 0.0;
+	double accumulator = 0.0;
 
-    while (!window_should_close())
-    {
+	while (!window_should_close()) {
 		update(v);
 
-        newTime = GetTime();
+		newTime = GetTime();
 
-        accumulator += newTime - currentTime;
-        currentTime = newTime;
+		accumulator += newTime - currentTime;
+		currentTime = newTime;
 
-        while (accumulator >= delta_time)
-        {
-            tick(v);
-            accumulator -= delta_time;
-        }
+		while (accumulator >= delta_time)
+		{
+			tick(v);
+			accumulator -= delta_time;
+		}
 
-        render(v);
-    }
+		render(v);
+	}
 
 	terminate(v);
 }
@@ -64,10 +68,14 @@ void vphys2d_run(void)
 static void update(Vphys2d *v)
 {
 	window_update(v->window);
+
+	player_update(v->player);
 }
 
 static void tick(Vphys2d *v)
 {
+	player_tick(v->player);
+
 	for (Node *temp = v->objects->head; temp != NULL; temp = temp->next)
 		object_tick(temp->data);
 }
@@ -86,6 +94,9 @@ static void render(Vphys2d *v)
 static void terminate(Vphys2d *v)
 {
 	window_destroy(v->window);
+
+	player_destroy(v->player); // doesn't free the object
 	list_destroy(v->objects);
+
 	free(v);
 }

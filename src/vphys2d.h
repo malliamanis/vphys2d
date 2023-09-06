@@ -6,6 +6,7 @@
 #include <stdint.h>
 
 #include "util/list.h"
+#include "objects/player.h"
 #include "graphics/window.h"
 #include "entities/entity.h"
 
@@ -19,6 +20,7 @@ typedef struct {
 	Window *window;
 
 	List *objects;
+	Player *player;
 } Vphys2d;
 
 void vphys2d_run(void);

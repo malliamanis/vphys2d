@@ -6,6 +6,10 @@
 #include "util/list.h"
 #include "entities/entity.h"
 
+#define METER ((float)(100.0f)) // 100px = 1m
+
+#define G ((float)(9.81f) * METER)
+
 typedef struct {
 	Entity *entity;
 

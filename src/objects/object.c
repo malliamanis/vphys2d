@@ -1,7 +1,7 @@
 #include <stdlib.h>
 
 #include "vphys2d.h"
-#include "physics/object.h"
+#include "objects/object.h"
 
 Object *object_create(Entity *entity, Vector2 acceleration, Vector2 velocity, float mass, List *objects)
 {
@@ -10,6 +10,7 @@ Object *object_create(Entity *entity, Vector2 acceleration, Vector2 velocity, fl
 	o->entity = entity;
 
 	o->acc = acceleration;
+	o->acc.y += G;
 	o->vel = velocity;
 	o->pos = (Vector2){entity->rect.x, entity->rect.y};
 
@@ -46,6 +47,12 @@ void object_tick(Object *o)
 
 	o->entity->rect.x = o->pos.x;
 	o->entity->rect.y = o->pos.y;
+
+	if (o->pos.y + o->entity->rect.height >= HEIGHT) {
+		o->pos.y = HEIGHT - o->entity->rect.height;
+		o->vel.y *= -1;
+	}
+
 }
 
 void object_render(Object *o)
