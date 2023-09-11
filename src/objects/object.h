@@ -21,7 +21,7 @@ typedef struct {
 	List *objects;
 } Object;
 
-Object *object_create(Entity *entity, Vector2 acceleration, Vector2 velocity, float mass, List *objects);
+Object *object_create(Vector2 position, float radius, Vector2 acceleration, Vector2 velocity, float mass, List *objects);
 
 void object_tick(Object *object);
 void object_render(Object *object);

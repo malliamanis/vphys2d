@@ -14,7 +14,7 @@
 #define HEIGHT 720
 #define TITLE "VPhys2D"
 
-#define DELTA_TIME ((double)(1 / 100.0))
+#define DELTA_TIME ((double)(1 / 1000.0))
 
 typedef struct {
 	Window *window;

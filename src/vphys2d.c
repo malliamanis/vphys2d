@@ -1,5 +1,6 @@
 #include <raylib.h>
 
+#include <time.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -24,19 +25,21 @@ static Vphys2d *init(void)
 
 	v->objects = list_create((destructor)object_destroy, sizeof(Object));
 
-	v->player = player_create(object_create(entity_create(200, HEIGHT - 50, 50, 50), (Vector2){0}, (Vector2){0}, 15.0f, v->objects));
+	v->player = player_create(object_create((Vector2){200, HEIGHT - 200}, 50, (Vector2){0}, (Vector2){0}, 10.0f, v->objects));
 
 	list_add(v->objects, v->player->obj);
-	list_add(v->objects, object_create(entity_create(WIDTH / 2.0f, 100, 25, 25), (Vector2){0}, (Vector2){0.0f, 100.0f}, 5.0f, v->objects));
-	list_add(v->objects, object_create(entity_create(WIDTH / 2.0f, 600, 25, 25), (Vector2){0}, (Vector2){0.0f, -700.0f * 1.5f}, 10.0f, v->objects));
-	list_add(v->objects, object_create(entity_create(0, 60, 25, 25), (Vector2){0}, (Vector2){0.0f, 100.0f}, 5.0f, v->objects));
-	list_add(v->objects, object_create(entity_create(0, 100, 25, 25), (Vector2){0}, (Vector2){0.0f, -700.0f * 1.5f}, 10.0f, v->objects));
+
+	for (int i = 0; i < 100; ++i) {
+		list_add(v->objects, object_create((Vector2){GetRandomValue(100, (WIDTH * 10) - 100) / 10.0f, GetRandomValue(100, (HEIGHT * 10) - 100) / 10.0f}, 10.0f, (Vector2){0}, (Vector2){100.0f * GetRandomValue(-1, 1), 0.0f}, 0.2f, v->objects));
+	}
 
 	return v;
 }
 
 void vphys2d_run(void)
 {
+	SetRandomSeed(time(NULL));
+
 	Vphys2d *v = init();
 
 	const double delta_time = DELTA_TIME;

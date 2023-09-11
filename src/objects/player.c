@@ -5,8 +5,8 @@
 
 #define JUMP ((float)(5.0f) * METER)
 
-#define ACC ((float)(10.0f) * METER)
-#define SPEED_MAX ((float)(5.0f) * METER)
+#define ACC ((float)(7.0f) * METER)
+#define SPEED_MAX ((float)(2.5f) * METER)
 
 Player *player_create(Object *object)
 {
@@ -28,7 +28,7 @@ void player_tick(Player *p)
 
 	if (key_a && p->obj->vel.x > -SPEED_MAX)
 		p->obj->acc.x = -ACC;
-	else if (key_d && p->obj->vel.x < SPEED_MAX)
+	if (key_d && p->obj->vel.x < SPEED_MAX)
 		p->obj->acc.x = ACC;
 
 	if (!key_a && !key_d)

@@ -3,14 +3,35 @@
 #include "entities/entity.h"
 #include "graphics/renderer.h"
 
-Entity *entity_create(float x, float y, float width, float height)
-{
-	Entity *e = calloc(1, sizeof(Entity));
+uint32_t id_count = 0;
 
-	e->rect.x = x;
-	e->rect.y = y;
-	e->rect.width = width;
-	e->rect.height = height;
+Entity *entity_create_circle(float x, float y, float radius)
+{
+	Entity *e = malloc(sizeof(Entity));
+
+	e->id = id_count++;
+	e->type = ENTITY_CIRCLE;
+
+	e->c.center = (Vector2){x, y};
+	e->c.radius = radius;
+
+	e->color = WHITE;
+
+	return e;
+}
+
+Entity *entity_create_rect(float x, float y, float width, float height)
+{
+	Entity *e = malloc(sizeof(Entity));
+
+	e->id = id_count++;
+	e->type = ENTITY_RECTANGLE;
+
+	e->r.x = x;
+	e->r.y = y;
+	e->r.width = width;
+	e->r.height = height;
+
 	e->color = WHITE;
 
 	return e;

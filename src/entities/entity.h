@@ -6,12 +6,30 @@
 #include <stdint.h>
 #include <stddef.h>
 
+typedef enum {
+	ENTITY_CIRCLE,
+	ENTITY_RECTANGLE
+} EntityType;
+
 typedef struct {
-	Rectangle rect;
+	Vector2 center;
+	float radius;
+} Circle;
+
+typedef struct {
+	uint32_t id;
+	EntityType type;
+
+	union {
+		Circle c;
+		Rectangle r;
+	};
+
 	Color color;
 } Entity;
 
-Entity *entity_create(float x, float y, float width, float height);
+Entity *entity_create_circle(float x, float y, float radius);
+Entity *entity_create_rect(float x, float y, float width, float height);
 
 void entity_render(Entity *entity);
 
