@@ -25,13 +25,14 @@ static Vphys2d *init(void)
 
 	v->objects = list_create((destructor)object_destroy, sizeof(Object));
 
-	v->player = player_create(object_create((Vector2){200, HEIGHT - 200}, 50, (Vector2){0}, (Vector2){0}, 10.0f, v->objects));
+	// v->player = player_create(object_create_rect((Vector2){200, HEIGHT - 200}, (Vector2){100, 100}, (Vector2){0}, (Vector2){0}, 10.0f, true, v->objects));
+	v->player = player_create(object_create_circle((Vector2){200, HEIGHT - 200}, 50.0f, (Vector2){0}, (Vector2){0}, 10.0f, false, v->objects));
 
-	list_add(v->objects, v->player->obj);
+	// list_add(v->objects, v->player->obj);
 
-	for (int i = 0; i < 100; ++i) {
-		list_add(v->objects, object_create((Vector2){GetRandomValue(100, (WIDTH * 10) - 100) / 10.0f, GetRandomValue(100, (HEIGHT * 10) - 100) / 10.0f}, 10.0f, (Vector2){0}, (Vector2){100.0f * GetRandomValue(-1, 1), 0.0f}, 0.2f, v->objects));
-	}
+	// for (int i = 0; i < 100; ++i) {
+	// 	list_add(v->objects, object_create((Vector2){GetRandomValue(100, (WIDTH * 10) - 100) / 10.0f, GetRandomValue(100, (HEIGHT * 10) - 100) / 10.0f}, 10.0f, (Vector2){0}, (Vector2){100.0f * GetRandomValue(-1, 1), 0.0f}, 0.2f, v->objects));
+	// }
 
 	return v;
 }

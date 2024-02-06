@@ -1,24 +1,46 @@
-#include <raylib.h>
-
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
+#include <raylib.h>
+
 #include "vphys2d.h"
 #include "util/mathutil.h"
 #include "objects/object.h"
 
-Object *object_create(Vector2 position, float radius, Vector2 acceleration, Vector2 velocity, float mass, List *objects)
+Object *object_create_rect(Vector2 position, Vector2 size, Vector2 acceleration, Vector2 velocity, float mass, bool gravity, List *objects)
+{
+	Object *o = malloc(sizeof(Object));
+
+	o->entity = entity_create_rect(position.x, position.y, size.x, size.y);
+
+	o->acc = acceleration;
+	if (gravity)
+		o->acc.y += G;
+	o->vel = velocity;
+	o->pos = position;
+
+	o->mass = mass;
+	o->charge = 0.0f; // It has to be set by the user manually;
+
+	o->objects = objects;
+
+	return o;
+}
+
+Object *object_create_circle(Vector2 position, float radius, Vector2 acceleration, Vector2 velocity, float mass, bool gravity, List *objects)
 {
 	Object *o = malloc(sizeof(Object));
 
 	o->entity = entity_create_circle(position.x, position.y, radius);
 
 	o->acc = acceleration;
-	o->acc.y += G;
+	if (gravity)
+		o->acc.y += G;
 	o->vel = velocity;
-	o->pos = (Vector2){o->entity->c.center.x, o->entity->c.center.y};
+	// o->pos = (Vector2){o->entity->c.center.x, o->entity->c.center.y};
+	o->pos = position;
 
 	o->mass = mass;
 
@@ -30,6 +52,9 @@ Object *object_create(Vector2 position, float radius, Vector2 acceleration, Vect
 void object_tick(Object *o)
 {
 	for (Node *temp = o->objects->head; temp->next != NULL; temp = temp->next) {
+		if (o->entity->type == ENTITY_RECTANGLE)
+			continue;
+
 		Object *o2 = temp->data;
 
 		if (o->entity->id == o2->entity->id)
@@ -79,24 +104,48 @@ void object_tick(Object *o)
 	o->pos.x += o->vel.x * DELTA_TIME;
 	o->pos.y += o->vel.y * DELTA_TIME;
 
-	o->entity->c.center = o->pos;
+	if (o->entity->type == ENTITY_CIRCLE) {
+		o->entity->c.center = o->pos;
 
-	if (o->pos.y + o->entity->c.radius >= HEIGHT) {
-		o->pos.y = HEIGHT - o->entity->c.radius;
-		o->vel.y *= -1;
-	}
-	else if (o->pos.y - o->entity->c.radius <= 0) {
-		o->pos.y = o->entity->c.radius;
-		o->vel.y *= -1;
-	}
+		if (o->pos.y + o->entity->c.radius >= HEIGHT) {
+			o->pos.y = HEIGHT - o->entity->c.radius;
+			o->vel.y *= -1;
+		}
+		else if (o->pos.y - o->entity->c.radius <= 0) {
+			o->pos.y = o->entity->c.radius;
+			o->vel.y *= -1;
+		}
 
-	if (o->pos.x + o->entity->c.radius >= WIDTH) {
-		o->pos.x = WIDTH - o->entity->c.radius;
-		o->vel.x *= -1;
+		if (o->pos.x + o->entity->c.radius >= WIDTH) {
+			o->pos.x = WIDTH - o->entity->c.radius;
+			o->vel.x *= -1;
+		}
+		else if (o->pos.x - o->entity->c.radius <= 0) {
+			o->pos.x = o->entity->c.radius;
+			o->vel.x *= -1;
+		}
 	}
-	else if (o->pos.x - o->entity->c.radius <= 0) {
-		o->pos.x = o->entity->c.radius;
-		o->vel.x *= -1;
+	else if (o->entity->type == ENTITY_RECTANGLE) {
+		o->entity->r.x = o->pos.x;
+		o->entity->r.y = o->pos.y;
+
+		if (o->pos.y + o->entity->r.height >= HEIGHT) {
+			o->pos.y = HEIGHT - o->entity->r.height;
+			o->vel.y *= -1;
+		}
+		else if (o->pos.y <= 0) {
+			o->pos.y = 0;
+			o->vel.y *= -1;
+		}
+
+		if (o->pos.x + o->entity->r.width >= WIDTH) {
+			o->pos.x = WIDTH - o->entity->r.width;
+			o->vel.x *= -1;
+		}
+		else if (o->pos.x <= 0) {
+			o->pos.x = 0;
+			o->vel.x *= -1;
+		}
 	}
 }
 
