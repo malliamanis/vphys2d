@@ -25,14 +25,21 @@ static Vphys2d *init(void)
 
 	v->objects = list_create((destructor)object_destroy, sizeof(Object));
 
-	// v->player = player_create(object_create_rect((Vector2){200, HEIGHT - 200}, (Vector2){100, 100}, (Vector2){0}, (Vector2){0}, 10.0f, true, v->objects));
-	v->player = player_create(object_create_circle((Vector2){200, HEIGHT - 200}, 50.0f, (Vector2){0}, (Vector2){0}, 10.0f, false, v->objects));
+	// v->player = player_create(object_create_rect((Vector2){200, HEIGHT - 200}, (Vector2){100, 100}, (Vector2){0}, (Vector2){0}, 0.0f, 10.0f, true, true, v->objects));
+	v->player = player_create(object_create_circle((Vector2){200, HEIGHT / 2.0f}, METER / 2.0f, (Vector2){0}, (Vector2){0}, 10.0f, false, true, v->objects));
+	list_add(v->objects, v->player->obj);
 
-	// list_add(v->objects, v->player->obj);
+	v->field = homefield_create((Vector2){WIDTH / 2.0f, HEIGHT / 2.0f}, 10 * METER, 13 * METER, 90.0f, 200.0f, v->objects);
 
-	// for (int i = 0; i < 100; ++i) {
-	// 	list_add(v->objects, object_create((Vector2){GetRandomValue(100, (WIDTH * 10) - 100) / 10.0f, GetRandomValue(100, (HEIGHT * 10) - 100) / 10.0f}, 10.0f, (Vector2){0}, (Vector2){100.0f * GetRandomValue(-1, 1), 0.0f}, 0.2f, v->objects));
-	// }
+	for (int i = 0; i < 200; ++i) {
+		Object *o = object_create_circle((Vector2){GetRandomValue(100, (WIDTH * 10) - 100) / 10.0f, GetRandomValue(100, (HEIGHT * 10) - 100) / 10.0f}, 10.0f, (Vector2){0}, (Vector2){10.0f * GetRandomValue(-1 * METER, 1 * METER), 0.0f}, 0.01f, false, true, v->objects);
+		o->charge = GetRandomValue(-100, 100) / 1000.0f;
+		list_add(v->objects, o);
+	}
+
+	Object *particle = object_create_circle((Vector2){METER / 5.0f, HEIGHT / 2.0f - 2.5 *METER}, METER / 5.0f, (Vector2){0}, (Vector2){METER * 10, 0.0f}, 0.01f, false, true, v->objects);
+	particle->charge = 0.02f;
+	list_add(v->objects, particle);
 
 	return v;
 }
@@ -42,8 +49,6 @@ void vphys2d_run(void)
 	SetRandomSeed(time(NULL));
 
 	Vphys2d *v = init();
-
-	const double delta_time = DELTA_TIME;
 
 	double currentTime = GetTime();
 	double newTime;
@@ -57,10 +62,10 @@ void vphys2d_run(void)
 		accumulator += newTime - currentTime;
 		currentTime = newTime;
 
-		while (accumulator >= delta_time)
+		while (accumulator >= DELTA_TIME)
 		{
 			tick(v);
-			accumulator -= delta_time;
+			accumulator -= DELTA_TIME;
 		}
 
 		render(v);
@@ -79,9 +84,11 @@ static void update(Vphys2d *v)
 static void tick(Vphys2d *v)
 {
 	player_tick(v->player);
+	homefield_tick(v->field);
 
 	for (Node *temp = v->objects->head; temp != NULL; temp = temp->next)
 		object_tick(temp->data);
+
 }
 
 static void render(Vphys2d *v)
@@ -100,6 +107,7 @@ static void terminate(Vphys2d *v)
 	window_destroy(v->window);
 
 	player_destroy(v->player); // doesn't free the object
+	homefield_destroy(v->field);
 	list_destroy(v->objects);
 
 	free(v);

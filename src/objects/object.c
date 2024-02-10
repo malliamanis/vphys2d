@@ -9,11 +9,11 @@
 #include "util/mathutil.h"
 #include "objects/object.h"
 
-Object *object_create_rect(Vector2 position, Vector2 size, Vector2 acceleration, Vector2 velocity, float mass, bool gravity, List *objects)
+Object *object_create_rect(Vector2 position, Vector2 size, Vector2 acceleration, Vector2 velocity, float rotation, float mass, bool gravity, bool bounded, List *objects)
 {
 	Object *o = malloc(sizeof(Object));
 
-	o->entity = entity_create_rect(position.x, position.y, size.x, size.y);
+	o->entity = entity_create_rect(position.x, position.y, size.x, size.y, rotation);
 
 	o->acc = acceleration;
 	if (gravity)
@@ -24,12 +24,14 @@ Object *object_create_rect(Vector2 position, Vector2 size, Vector2 acceleration,
 	o->mass = mass;
 	o->charge = 0.0f; // It has to be set by the user manually;
 
+	o->bounded = bounded;
+
 	o->objects = objects;
 
 	return o;
 }
 
-Object *object_create_circle(Vector2 position, float radius, Vector2 acceleration, Vector2 velocity, float mass, bool gravity, List *objects)
+Object *object_create_circle(Vector2 position, float radius, Vector2 acceleration, Vector2 velocity, float mass, bool gravity, bool bounded, List *objects)
 {
 	Object *o = malloc(sizeof(Object));
 
@@ -43,6 +45,9 @@ Object *object_create_circle(Vector2 position, float radius, Vector2 acceleratio
 	o->pos = position;
 
 	o->mass = mass;
+	o->charge = 0.0f;
+
+	o->bounded = bounded;
 
 	o->objects = objects;
 
@@ -51,11 +56,13 @@ Object *object_create_circle(Vector2 position, float radius, Vector2 acceleratio
 
 void object_tick(Object *o)
 {
-	for (Node *temp = o->objects->head; temp->next != NULL; temp = temp->next) {
+	for (Node *temp = o->objects->head; temp != NULL; temp = temp->next) {
 		if (o->entity->type == ENTITY_RECTANGLE)
-			continue;
+			break;
 
 		Object *o2 = temp->data;
+		if (o2->entity->type == ENTITY_RECTANGLE)
+			continue;
 
 		if (o->entity->id == o2->entity->id)
 			continue;
@@ -103,6 +110,10 @@ void object_tick(Object *o)
 
 	o->pos.x += o->vel.x * DELTA_TIME;
 	o->pos.y += o->vel.y * DELTA_TIME;
+
+	if (!o->bounded) {
+		return;
+	}
 
 	if (o->entity->type == ENTITY_CIRCLE) {
 		o->entity->c.center = o->pos;

@@ -3,7 +3,7 @@
 #include "entities/entity.h"
 #include "graphics/renderer.h"
 
-uint32_t id_count = 0;
+static uint32_t id_count = 0;
 
 Entity *entity_create_circle(float x, float y, float radius)
 {
@@ -14,13 +14,14 @@ Entity *entity_create_circle(float x, float y, float radius)
 
 	e->c.center = (Vector2){x, y};
 	e->c.radius = radius;
+	e->rotation = 0.0f;
 
 	e->color = WHITE;
 
 	return e;
 }
 
-Entity *entity_create_rect(float x, float y, float width, float height)
+Entity *entity_create_rect(float x, float y, float width, float height, float rotation)
 {
 	Entity *e = malloc(sizeof(Entity));
 
@@ -31,6 +32,7 @@ Entity *entity_create_rect(float x, float y, float width, float height)
 	e->r.y = y;
 	e->r.width = width;
 	e->r.height = height;
+	e->rotation = rotation;
 
 	e->color = WHITE;
 

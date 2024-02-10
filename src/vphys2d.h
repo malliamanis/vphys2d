@@ -9,9 +9,10 @@
 #include "objects/player.h"
 #include "graphics/window.h"
 #include "entities/entity.h"
+#include "objects/homefield.h"
 
-#define WIDTH 1280
-#define HEIGHT 720
+#define WIDTH 1600
+#define HEIGHT ((int)(WIDTH / 16 * 9))
 #define TITLE "VPhys2D"
 
 #define DELTA_TIME ((double)(1 / 1000.0))
@@ -21,6 +22,7 @@ typedef struct {
 
 	List *objects;
 	Player *player;
+	HomEField *field;
 } Vphys2d;
 
 void vphys2d_run(void);

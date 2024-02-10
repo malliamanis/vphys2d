@@ -25,11 +25,13 @@ typedef struct {
 		Rectangle r;
 	};
 
+	float rotation; // useless for circles but added outside of the union for convenience
+
 	Color color;
 } Entity;
 
 Entity *entity_create_circle(float x, float y, float radius);
-Entity *entity_create_rect(float x, float y, float width, float height);
+Entity *entity_create_rect(float x, float y, float width, float height, float rotation);
 
 void entity_render(Entity *entity);
 
