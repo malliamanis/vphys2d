@@ -21,8 +21,11 @@ Object *object_create_rect(Vector2 position, Vector2 size, Vector2 acceleration,
 	o->vel = velocity;
 	o->pos = position;
 
+	o->a_acc = 0.0f;
+	o->a_vel = 0.0f;
+
 	o->mass = mass;
-	o->charge = 0.0f; // It has to be set by the user manually;
+	o->charge = 0.0f; // It has to be set by the user manually
 
 	o->bounded = bounded;
 
@@ -67,8 +70,12 @@ void object_tick(Object *o)
 		if (o->entity->id == o2->entity->id)
 			continue;
 
-
 		if (CheckCollisionCircles(o->pos, o->entity->c.radius, o2->pos, o2->entity->c.radius)) {
+			if (math_vec2_length(o->vel) == 0)
+				o->vel = math_vec2_add(o->vel, (Vector2){0.000001f, 0.000001f});
+			if (math_vec2_length(o2->vel) == 0)
+				o2->vel = math_vec2_add(o2->vel, (Vector2){0.000001f, 0.000001f});
+
 			const Vector2 v1 = o->vel;
 			const Vector2 v2 = o2->vel;
 
@@ -105,11 +112,27 @@ void object_tick(Object *o)
 		}
 	}
 
+	for (Node *temp = o->objects->head; temp != NULL; temp = temp->next) {
+		if (o->entity->type == ENTITY_CIRCLE)
+			break;
+
+		Object *o2 = temp->data;
+		if (o2->entity->type == ENTITY_CIRCLE)
+			continue;
+
+		if (CheckCollisionRecs(o->entity->r, o2->entity->r)) {
+			
+		}
+	}
+
 	o->vel.x += o->acc.x * DELTA_TIME;
 	o->vel.y += o->acc.y * DELTA_TIME;
 
 	o->pos.x += o->vel.x * DELTA_TIME;
 	o->pos.y += o->vel.y * DELTA_TIME;
+
+	o->a_vel += o->a_acc * DELTA_TIME;
+	o->entity->rotation += o->a_vel * DELTA_TIME;
 
 	if (!o->bounded) {
 		return;
@@ -140,21 +163,21 @@ void object_tick(Object *o)
 		o->entity->r.x = o->pos.x;
 		o->entity->r.y = o->pos.y;
 
-		if (o->pos.y + o->entity->r.height >= HEIGHT) {
-			o->pos.y = HEIGHT - o->entity->r.height;
+		if (o->pos.y + o->entity->r.height / 2.0f >= HEIGHT) {
+			o->pos.y = HEIGHT - o->entity->r.height / 2.0f;
 			o->vel.y *= -1;
 		}
-		else if (o->pos.y <= 0) {
-			o->pos.y = 0;
+		else if (o->pos.y - o->entity->r.height / 2.0f <= 0) {
+			o->pos.y = o->entity->r.height / 2.0f;
 			o->vel.y *= -1;
 		}
 
-		if (o->pos.x + o->entity->r.width >= WIDTH) {
-			o->pos.x = WIDTH - o->entity->r.width;
+		if (o->pos.x + o->entity->r.width / 2.0f >= WIDTH) {
+			o->pos.x = WIDTH - o->entity->r.width / 2.0f;
 			o->vel.x *= -1;
 		}
-		else if (o->pos.x <= 0) {
-			o->pos.x = 0;
+		else if (o->pos.x - o->entity->r.width / 2.0f <= 0) {
+			o->pos.x = o->entity->r.width / 2.0f;
 			o->vel.x *= -1;
 		}
 	}

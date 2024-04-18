@@ -1,3 +1,4 @@
+#include <raylib.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -35,6 +36,14 @@ void homefield_tick(HomEField *h)
 		Object *o = temp->data;
 		if (o->charge == 0.0f)
 			continue;
+
+		if (o->entity->type == ENTITY_RECTANGLE) {
+			if (CheckCollisionRecs(h->p_plate->entity->r, o->entity->r) || CheckCollisionRecs(h->n_plate->entity->r, o->entity->r)) 
+				o->vel.y = 0;
+		}
+		else if (o->entity->type == ENTITY_CIRCLE) {
+			// Do something
+		}
 
 		if (o->pos.x >= h->p_plate->pos.x && o->pos.x <= h->p_plate->pos.x + h->p_plate->entity->r.width) {
 			if (o->pos.y >= h->p_plate->pos.y + h->p_plate->entity->r.height && o->pos.y <= h->n_plate->pos.y) {

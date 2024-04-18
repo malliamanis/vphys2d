@@ -16,6 +16,7 @@ typedef struct {
 	Entity *entity;
 
 	Vector2 acc, vel, pos;
+	float a_acc, a_vel;
 
 	float mass; // in Kg
 	float charge; // in Coulombs

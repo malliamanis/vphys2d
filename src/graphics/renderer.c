@@ -12,5 +12,5 @@ void renderer_render_entity(Entity *e)
 	if (e->type == ENTITY_CIRCLE)
 		DrawCircleV(e->c.center, e->c.radius, e->color);
 	else if (e->type == ENTITY_RECTANGLE)
-		DrawRectangleRec(e->r, e->color);
+		DrawRectanglePro(e->r, (Vector2){e->r.width / 2.0f, e->r.height / 2.0f}, RAD2DEG * e->rotation, e->color);
 }

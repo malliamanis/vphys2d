@@ -11,11 +11,11 @@
 #include "entities/entity.h"
 #include "objects/homefield.h"
 
-#define WIDTH 1600
+#define WIDTH 1280
 #define HEIGHT ((int)(WIDTH / 16 * 9))
 #define TITLE "VPhys2D"
 
-#define DELTA_TIME ((double)(1 / 1000.0))
+#define DELTA_TIME ((double)(1 / 500.0))
 
 typedef struct {
 	Window *window;
